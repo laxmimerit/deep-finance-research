@@ -89,3 +89,5 @@ hf_xet
 langchain_mcp_adapters
 nest_asyncio
 docling[vlm]
+fastembed
+fastembed-gpu
