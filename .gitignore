@@ -214,6 +214,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-.langgraph_api
-.langgraph_api/*
+.claude
+*.claude
+nul
 *.db
+*.db-shm
+*.db-wal
+vertex-ai.json

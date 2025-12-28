@@ -4,14 +4,18 @@ warnings.filterwarnings('ignore')
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
+
 from datetime import datetime
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from scripts.rag_tools import hybrid_search, live_finance_researcher, think_tool
 
+from scripts.rag_tools import hybrid_search, live_finance_researcher, think_tool
 from deepagents import create_deep_agent
+
 from scripts.deep_prompts import DEEP_RESEARCHER_INSTRUCTIONS, DEEP_ORCHESTRATOR_INSTRUCTIONS
+
+
+# ## Create Research Sub-Agent
 
 # Get current date
 current_date = datetime.now().strftime("%Y-%m-%d")
@@ -24,7 +28,6 @@ research_sub_agent = {
     "tools": [hybrid_search, live_finance_researcher, think_tool],
 }
 
-# ## Initialize LLM and Create DeepAgent
 
 # Initialize model
 model = ChatGoogleGenerativeAI(model='gemini-3-flash-preview')
@@ -39,3 +42,5 @@ agent = create_deep_agent(
     system_prompt=DEEP_ORCHESTRATOR_INSTRUCTIONS,
     subagents=[research_sub_agent]
 )
+
+
