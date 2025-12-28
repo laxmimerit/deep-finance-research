@@ -1,110 +1,155 @@
-# 🚀 Deep Research
+# Deep Research Environment Setup - Linux
 
-## 🚀 Quickstart
+Complete setup for LangGraph Deep Research on Ubuntu/Linux.
 
-**Prerequisites**: Install [uv](https://docs.astral.sh/uv/) package manager:
+## Prerequisites
+
+- Ubuntu 20.04+ or compatible Linux distribution
+- 8GB RAM minimum
+- 10GB free disk space
+- Internet connection
+
+## 1. Update System
+
+```bash
+sudo apt update && sudo apt upgrade -y
+cd ~
+```
+
+## 2. Install uv (Python Package Manager)
+
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc
 ```
 
-Ensure you are in the `deep_research` directory:
+Verify installation:
 ```bash
-cd deep_research
+uv --version
 ```
 
-Install packages:
+## 3. Install LangGraph CLI
+
 ```bash
+pip install -U langgraph-cli
+# Optional: with in-memory server support
+pip install -U "langgraph-cli[inmem]"
+```
+
+Verify:
+```bash
+langgraph --help
+```
+
+## 4. Install Node.js via nvm
+
+Install nvm:
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+```
+
+Install Node.js 24 LTS (latest):
+```bash
+nvm install 24
+nvm use 24
+```
+
+Install Yarn:
+```bash
+npm install -g yarn
+# Or use Corepack (built into Node.js 16.9+)
+corepack enable
+corepack prepare yarn@stable --activate
+```
+
+Verify:
+```bash
+node --version
+npm --version
+yarn --version
+```
+
+## 5. Configure API Keys
+
+Create `.env` file in your project root:
+
+```bash
+# LangSmith (recommended for tracing)
+LANGSMITH_API_KEY="lsv2_your-key-here"
+LANGSMITH_TRACING=true
+LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
+LANGCHAIN_PROJECT="multi-agent-research"
+
+# Optional API keys
+GOOGLE_API_KEY="your-google-key-here"
+OLLAMA_API_KEY="your-ollama-key-here"
+WEATHER_API_KEY="your-weather-key-here"
+QDRANT_API_KEY="your-qdrant-key-here"
+```
+
+Get API keys from:
+- LangSmith: https://smith.langchain.com/
+- Google: https://makersuite.google.com/app/apikey
+
+## 6. Clone and Setup Backend
+
+```bash
+git clone https://github.com/laxmimerit/deep-finance-research.git
+cd deep-finance-research
 uv sync
 ```
 
-Set your API keys in your environment:
-
-```bash
-export ANTHROPIC_API_KEY=your_anthropic_api_key_here  # Required for Claude model
-export GOOGLE_API_KEY=your_google_api_key_here        # Required for Gemini model ([get one here](https://ai.google.dev/gemini-api/docs))
-export TAVILY_API_KEY=your_tavily_api_key_here        # Required for web search ([get one here](https://www.tavily.com/)) with a generous free tier
-export LANGSMITH_API_KEY=your_langsmith_api_key_here  # [LangSmith API key](https://smith.langchain.com/settings) (free to sign up)
-```
-
-## Usage Options
-
-You can run this quickstart in two ways:
-
-### Option 1: Jupyter Notebook
-
-Run the interactive notebook to step through the research agent:
-
-```bash
-uv run jupyter notebook research_agent.ipynb
-```
-
-### Option 2: LangGraph Server
-
-Run a local [LangGraph server](https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/) with a web interface:
-
+Start LangGraph server:
 ```bash
 langgraph dev
 ```
 
-LangGraph server will open a new browser window with the Studio interface, which you can submit your search query to: 
+Server runs on http://localhost:2024
 
-<img width="2869" height="1512" alt="Screenshot 2025-11-17 at 11 42 59 AM" src="https://github.com/user-attachments/assets/03090057-c199-42fe-a0f7-769704c2124b" />
-
-You can also connect the LangGraph server to a [UI specifically designed for deepagents](https://github.com/langchain-ai/deep-agents-ui):
+## 7. Setup UI (New Terminal)
 
 ```bash
-$ git clone https://github.com/langchain-ai/deep-agents-ui.git
-$ cd deep-agents-ui
-$ yarn install
-$ yarn dev
+git clone https://github.com/langchain-ai/deep-agents-ui.git
+cd deep-agents-ui
+yarn install
+yarn dev
 ```
 
-Then follow the instructions in the [deep-agents-ui README](https://github.com/langchain-ai/deep-agents-ui?tab=readme-ov-file#connecting-to-a-langgraph-server) to connect the UI to the running LangGraph server.
+UI available at http://localhost:3000
 
-This provides a user-friendly chat interface and visualization of files in state. 
+## Quick Start Commands
 
-<img width="2039" height="1495" alt="Screenshot 2025-11-17 at 1 11 27 PM" src="https://github.com/user-attachments/assets/d559876b-4c90-46fb-8e70-c16c93793fa8" />
-
-## 📚 Resources
-
-- **[Deep Research Course](https://academy.langchain.com/courses/deep-research-with-langgraph)** - Full course on deep research with LangGraph
-
-### Custom Model
-
-By default, `deepagents` uses `"claude-sonnet-4-5-20250929"`. You can customize this by passing any [LangChain model object](https://python.langchain.com/docs/integrations/chat/). See the Deepagents package [README](https://github.com/langchain-ai/deepagents?tab=readme-ov-file#model) for more details.
-
-```python
-from langchain.chat_models import init_chat_model
-from deepagents import create_deep_agent
-
-# Using Claude
-model = init_chat_model(model="anthropic:claude-sonnet-4-5-20250929", temperature=0.0)
-
-# Using Gemini
-from langchain_google_genai import ChatGoogleGenerativeAI
-model = ChatGoogleGenerativeAI(model="gemini-3-pro-preview")
-
-agent = create_deep_agent(
-    model=model,
-)
+Terminal 1 (Backend):
+```bash
+cd ~/deep-finance-research
+langgraph dev
 ```
 
-### Custom Instructions
+Terminal 2 (Frontend):
+```bash
+cd ~/deep-agents-ui
+yarn dev
+```
 
-The deep research agent uses custom instructions defined in `deep_research/research_agent/prompts.py` that complement (rather than duplicate) the default middleware instructions. You can modify these in any way you want. 
+## Troubleshooting
 
-| Instruction Set | Purpose |
-|----------------|---------|
-| `RESEARCH_WORKFLOW_INSTRUCTIONS` | Defines the 5-step research workflow: save request → plan with TODOs → delegate to sub-agents → synthesize → respond. Includes research-specific planning guidelines like batching similar tasks and scaling rules for different query types. |
-| `SUBAGENT_DELEGATION_INSTRUCTIONS` | Provides concrete delegation strategies with examples: simple queries use 1 sub-agent, comparisons use 1 per element, multi-faceted research uses 1 per aspect. Sets limits on parallel execution (max 3 concurrent) and iteration rounds (max 3). |
-| `RESEARCHER_INSTRUCTIONS` | Guides individual research sub-agents to conduct focused web searches. Includes hard limits (2-3 searches for simple queries, max 5 for complex), emphasizes using `think_tool` after each search for strategic reflection, and defines stopping criteria. |
+**Permission errors with uv:**
+```bash
+sudo chown -R $USER ~/.local/share/uv
+```
 
-### Custom Tools
+**Node version issues:**
+```bash
+nvm install --lts
+nvm use --lts
+```
 
-The deep research agent adds the following custom tools beyond the built-in deepagent tools. You can also use your own tools, including via MCP servers. See the Deepagents package [README](https://github.com/langchain-ai/deepagents?tab=readme-ov-file#mcp) for more details.
+**Port conflicts:**
+```bash
+# Backend on different port
+langgraph dev --port 8080
 
-| Tool Name | Description |
-|-----------|-------------|
-| `tavily_search` | Web search tool that uses Tavily purely as a URL discovery engine. Performs searches using Tavily API to find relevant URLs, fetches full webpage content via HTTP with proper User-Agent headers (avoiding 403 errors), converts HTML to markdown, and returns the complete content without summarization to preserve all information for the agent's analysis. Works with both Claude and Gemini models. |
-| `think_tool` | Strategic reflection mechanism that helps the agent pause and assess progress between searches, analyze findings, identify gaps, and plan next steps. |
-
+# Frontend on different port
+PORT=3001 yarn dev
+```
